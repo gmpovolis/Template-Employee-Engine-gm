@@ -9,72 +9,84 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
-
+var team = [];
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
-var team = [];
+
 async function addMember(){
-    const answers = await inquirer.prompt([
-        {
-            type: "input",
-            name: "name",
-            message: "What is the name of the Employee?"
-        },
-        {
-            type: "input",
-            name: "role",
-            message: "What is your employee's role?"
-        },
-        {
-            type: "input",
-            name: "id",
-            message: "What is the employee's ID?"
-        },
-        {
-            type: "input",
-            name: "email",
-            message: "What is the employee's email?"
-        },
-        {
-            type: "input",
-            name: "github",
-            message: "What is the employee's github link?",
-            when: (answers) => answers.role.toLowerCase() === "engineer"
-        },
-        {
-            type: "input",
-            name: "school",
-            message: "What is the employee's school?",
-            when: (answers) => answers.role.toLowerCase() === "intern"
-        },
-        {
-            type: "input",
-            name: "officeNumber",
-            message: "What is the manager's office number?",
-            when: (answers) => answers.role.toLowerCase() === "manager"
-        },
-        {
-            type: "confirm",
-            name: "another",
-            message: "Do you want to hire another employee?",
-            default: false
-        }
-    ])
-    switch(answers.role.toLowerCase()){
-        case "manager":
-            var employee = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
-        case "intern":
-            var employee = new Intern(answers.name, answers.id, answers.email, answers.school);
-        case "engineer":
-            var employee = new Engineer(answers.name, answers.id, answers.email, answers.github);
-    }
-    team.push(employee);
-    if(answers.another){
-        addMember();
+    try {
+        const answers = await inquirer.prompt([
+            {
+                type: "input",
+                name: "name",
+                message: "What is the name of the Employee?"
+            },
+            {
+                type: "input",
+                name: "role",
+                message: "What is your employee's role?"
+            },
+            {
+                type: "input",
+                name: "id",
+                message: "What is the employee's ID?"
+            },
+            {
+                type: "input",
+                name: "email",
+                message: "What is the employee's email?"
+            },
+            {
+                type: "input",
+                name: "github",
+                message: "What is the employee's github link?",
+                when: (answers) => answers.role.toLowerCase() === "engineer"
+            },
+            {
+                type: "input",
+                name: "school",
+                message: "What is the employee's school?",
+                when: (answers) => answers.role.toLowerCase() === "intern"
+            },
+            {
+                type: "input",
+                name: "officeNumber",
+                message: "What is the manager's office number?",
+                when: (answers) => answers.role.toLowerCase() === "manager"
+            },
+            {
+                type: "confirm",
+                name: "another",
+                message: "Do you want to hire another employee?",
+                default: false
+            }
+        ]).then((answers)=> {
+            switch(answers.role.toLowerCase()){
+                case "manager":
+                    var employee = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
+                case "intern":
+                    var employee = new Intern(answers.name, answers.id, answers.email, answers.school);
+                case "engineer":
+                    var employee = new Engineer(answers.name, answers.id, answers.email, answers.github);
+            }
+            team.push(employee);
+            if(answers.another){
+                addMember();
+            } else {
+                const createdHtml = render(team);
+                fs.writeFile(outputPath, createdHtml);
+            }
+        })
+        
+    } catch(err) {
+        console.log(err);
     }
 }
+
 addMember();
+
+
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
