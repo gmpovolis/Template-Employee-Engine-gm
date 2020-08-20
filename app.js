@@ -62,7 +62,6 @@ async function addMember(){
                 default: false
             }
         ]).then((answers)=> {
-            console.log('answers: ', answers);
             switch(answers.role.toLowerCase()){
                 case "manager":
                     var employee = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
