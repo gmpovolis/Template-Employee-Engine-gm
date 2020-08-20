@@ -16,7 +16,7 @@ var team = [];
 
 async function addMember(){
     try {
-        const answers = await inquirer.prompt([
+        return answers = await inquirer.prompt([
             {
                 type: "input",
                 name: "name",
@@ -62,23 +62,29 @@ async function addMember(){
                 default: false
             }
         ]).then((answers)=> {
+            console.log('answers: ', answers);
             switch(answers.role.toLowerCase()){
                 case "manager":
                     var employee = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
+                    break;
                 case "intern":
                     var employee = new Intern(answers.name, answers.id, answers.email, answers.school);
+                    break;
                 case "engineer":
                     var employee = new Engineer(answers.name, answers.id, answers.email, answers.github);
+                    break;
             }
             team.push(employee);
             if(answers.another){
                 addMember();
             } else {
                 const createdHtml = render(team);
-                fs.writeFile(outputPath, createdHtml);
+                fs.writeFile(outputPath, createdHtml, (err)=>{
+                    if (err) throw err;
+                    console.log("Succesfully wrote file");
+                });
             }
         })
-        
     } catch(err) {
         console.log(err);
     }
